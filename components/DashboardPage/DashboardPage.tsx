@@ -7,6 +7,7 @@ import { usePackageChartData } from "@/store/usePackageChartData";
 import { useSponsorStore } from "@/store/useSponsortStore";
 import { useUserDashboardEarningsStore } from "@/store/useUserDashboardEarnings";
 import { useUserEarningsStore } from "@/store/useUserEarningsStore";
+import { client } from "@/utils/rpc/rpc";
 import { createClientSide } from "@/utils/supabase/client";
 import {
   alliance_member_table,
@@ -79,6 +80,8 @@ const DashboardPage = ({
         directReferralCount: totalEarnings.directReferralCount ?? 0,
         indirectReferralCount: totalEarnings.indirectReferralCount ?? 0,
       });
+      const profile = await client.$get();
+      console.log(profile);
 
       setEarnings(userEarningsData);
     } catch (e) {
