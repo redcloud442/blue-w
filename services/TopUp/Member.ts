@@ -57,23 +57,24 @@ export const updateTopUpStatus = async (params: {
 
 export const handleDepositRequest = async (params: {
   TopUpFormValues: TopUpFormValues;
-  publicUrl: string;
+  file: File;
 }) => {
+  const formData = new FormData();
+  formData.append("file", params.file);
+  formData.append("accountName", params.TopUpFormValues.accountName);
+  formData.append("amount", params.TopUpFormValues.amount);
+  formData.append("topUpMode", params.TopUpFormValues.topUpMode);
+  formData.append("accountNumber", params.TopUpFormValues.accountNumber);
+
   const response = await fetch(`/api/v1/deposit`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-
-    body: JSON.stringify(params),
+    body: formData,
   });
 
   const result = await response.json();
 
   if (!response.ok) {
-    throw new Error(
-      result.error || "An error occurred while creating the top-up request."
-    );
+    throw new Error(result.message);
   }
 
   return response;

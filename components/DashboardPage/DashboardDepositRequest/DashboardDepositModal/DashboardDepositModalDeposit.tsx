@@ -40,7 +40,6 @@ import { alliance_member_table, merchant_table } from "@prisma/client";
 import { BANK_IMAGE } from "@/utils/constant";
 import { AlertCircle, Loader2 } from "lucide-react";
 import Image from "next/image";
-import { NextResponse } from "next/server";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
@@ -132,26 +131,9 @@ const DashboardDepositModalDeposit = ({
       const sanitizedData = escapeFormData(data);
       const file = data.file;
 
-      const filePath = `uploads/${Date.now()}_${file.name}`;
-
-      const { error: uploadError } = await supabaseClient.storage
-        .from("REQUEST_ATTACHMENTS")
-        .upload(filePath, file, { upsert: true });
-
-      if (uploadError) {
-        return NextResponse.json(
-          { error: "File upload failed.", details: uploadError.message },
-          { status: 500 }
-        );
-      }
-
-      const publicUrl =
-        "https://cdn.primepinas.com/storage/v1/object/public/REQUEST_ATTACHMENTS/" +
-        filePath;
-
       await handleDepositRequest({
         TopUpFormValues: sanitizedData,
-        publicUrl,
+        file,
       });
 
       toast({
@@ -179,12 +161,6 @@ const DashboardDepositModalDeposit = ({
       setCanUserDeposit(true);
     } catch (e) {
       if (e instanceof Error) {
-        await logError(supabaseClient, {
-          errorMessage: e.message,
-          stackTrace: e.stack,
-          stackPath:
-            "components/DashboardPage/DashboardDepositRequest/DashboardDepositModal/DashboardDepositModalDeposit.tsx",
-        });
         toast({
           title: "Error",
           description: e.message,
